@@ -38,7 +38,8 @@ export class UsersService {
     return `This action updates a #${id} user`;
   }
 
-  remove(id: string) {
-    return this.db.user.delete({where:{id}})
+  async remove(id: string) {
+    await this.db.user.delete({where:{id}})
+    return { message: `User removed id: ${id}`}
   }
 }
