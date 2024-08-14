@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto, genAPIKey } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DbService } from 'src/db/db.service';
@@ -39,7 +39,9 @@ export class UsersService {
   }
 
   async remove(id: string) {
-    await this.db.user.delete({where:{id}})
+    const user = await this.findOneById(id);
+    if (!user) throw new NotFoundException(`No user found`);
+    await this.db.user.delete({where:{id: user.id}})
     return { message: `User removed id: ${id}`}
   }
 }
