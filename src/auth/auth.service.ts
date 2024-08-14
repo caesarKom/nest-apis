@@ -46,6 +46,6 @@ export class AuthService {
     if (!key) {
       throw new NotFoundException(`Not Found Key!`);
     }
-    return { apiKey: key };
+    return { apiKey: key.apiKey };
   }
 }

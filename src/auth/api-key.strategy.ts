@@ -9,9 +9,12 @@ export class ApiKey implements NestMiddleware {
     async use(req: Request, res: Response, next: NextFunction) {
         const apiKey = req.headers.authorization;
         const account = await this.db.user.findFirst({where: { apiKey }})
-        
-        if (!account && account.apiKey !== apiKey) {
+
+        if (!account) {
             throw new UnauthorizedException();
+        }
+        if (account.apiKey !== apiKey) {
+            throw new UnauthorizedException("Api key no match");
         }
         
         return next();
