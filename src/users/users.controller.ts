@@ -12,25 +12,31 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UserObj } from 'src/decorators/user.decorator';
+import { User } from '@prisma/client';
 
 @Controller('users')
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
   async findAll() {
     const users = await this.usersService.findAll();
     if (users.length === 0) {
       return { msg: 'Not Users on database' };
     }
     return users;
+  }
+  
+  @Get('profile')
+  profile(@UserObj() user: User) {
+    return this.usersService.findOneById(user.id);
   }
 
   @Get(':id')
