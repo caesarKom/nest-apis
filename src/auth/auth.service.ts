@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { DbService } from 'src/db/db.service';
 import { AuthEnity } from './entity/auth.entity';
 import * as bcrypt from 'bcrypt';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { CreateUserDto, genAPIKey } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
 import { User } from '@prisma/client';
 
@@ -34,7 +34,18 @@ export class AuthService {
   }
 
   async register(createUserDto: CreateUserDto) {
-    await this.userService.create(createUserDto);
+    const isExist = await this.userService.findOneByEmail(createUserDto.email);
+    if (isExist) {
+      return { msg: "User already exist on system"}
+    }
+    const hashPwd = await bcrypt.hash(createUserDto.password, 12)
+    
+    await this.db.user.create({ data: {
+      username: createUserDto.username,
+      email: createUserDto.email,
+      apiKey: genAPIKey(),
+      password: hashPwd,
+    }})
 
     return { message: 'User registered successfully' };
   }
