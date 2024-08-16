@@ -24,8 +24,8 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(201)
-  register(@Body() createUserDto: CreateUserDto) {
-    return this.authService.register(createUserDto);
+  async register(@Body() createUserDto: CreateUserDto) {
+    return await this.authService.register(createUserDto);
   }
 
   @Get('api-key')
